@@ -13,10 +13,11 @@ public class Alarm : MonoBehaviour
     private float _minVolume = 0f;
     private float _maxVolume = 1f;
     private float _targetVolume;
+    private Coroutine _soundCoroutine;
 
     private void Start()
     {
-        _sound.volume = _minVolume;
+        _sound.volume = _minVolume; 
     }
 
     private void OnEnable()
@@ -31,23 +32,33 @@ public class Alarm : MonoBehaviour
         _area.ThiefExited -= MuteDown;
     }
 
-    private void Update()
+    private IEnumerator PlaySound()
     {
-        if (_sound.isPlaying)
+        var wait = new WaitForFixedUpdate();
+
+        while (_sound.isPlaying)
         {
             _sound.volume = Mathf.MoveTowards(_sound.volume, _targetVolume, _recoveryRate * Time.deltaTime);
-            
+
             if (_sound.volume <= _minVolume)
             {
+                StopCoroutine(_soundCoroutine);
                 _sound.Stop();
             }
+
+            yield return wait;
         }
     }
 
     private void On()
     {
         _targetVolume = _maxVolume;
-        _sound.Play();
+
+        if (_sound.isPlaying == false)
+        {
+            _sound.Play();
+            _soundCoroutine = StartCoroutine(PlaySound());
+        }
     }
 
     private void MuteDown()
