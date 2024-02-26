@@ -4,22 +4,21 @@ using UnityEngine;
 [RequireComponent (typeof(Collider))]
 public class AlarmArea : MonoBehaviour
 {
-    public event Action ThiefEntered;
-    public event Action ThiefExited;
+    [SerializeField] private Alarm _alarm;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.TryGetComponent(out Thief thief))
+        if (other.transform.TryGetComponent(out Thief _))
         {
-            ThiefEntered?.Invoke();
+            _alarm.On();
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.TryGetComponent(out Thief thief))
+        if (other.transform.TryGetComponent(out Thief _))
         {
-            ThiefExited?.Invoke();
+            _alarm.MuteDown();
         }
     }
 }
